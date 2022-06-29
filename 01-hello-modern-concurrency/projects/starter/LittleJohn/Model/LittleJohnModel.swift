@@ -48,6 +48,20 @@ class LittleJohnModel: ObservableObject {
     }
   }
 
+  func availableSymbols() async throws -> [String] {
+    guard let url = URL(string: "http://localhost:8080/littlejohn/symbols")
+    else {
+      throw "the URL could not be created"
+    }
+
+    let (data, response) = try await URLSession.shared.data(from: url)
+    guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+      throw "The server responded with an error"
+    }
+
+    return try JSONDecoder().decode([String].self, from: data)
+  }
+
   /// A URL session that lets requests run indefinitely so we can receive live updates from server.
   private lazy var liveURLSession: URLSession = {
     var configuration = URLSessionConfiguration.default
